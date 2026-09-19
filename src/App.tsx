@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { Camera, Sliders, Frame, Sparkles, Wand2, ShieldCheck, HeartHandshake, Table, Check } from 'lucide-react';
+import { Camera, Sliders, Frame, Sparkles, Wand2, ShieldCheck, HeartHandshake, Check } from 'lucide-react';
 import { RawProduct, FilterSettings, BorderSettings, StickerBadge, ViewMode, AspectRatio, FilterPreset, FestiveCopy } from './types';
 import { SAMPLE_PRODUCTS } from './data/sampleProducts';
 import { FILTER_PRESETS, DEFAULT_FILTER_SETTINGS } from './data/filterPresets';
