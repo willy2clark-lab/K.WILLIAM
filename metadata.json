@@ -1,0 +1,6 @@
+{
+  "name": "Studio Photo Festif",
+  "description": "Application de retouche studio et création de posts festifs pour produits e-commerce avec filtres colorimétriques 2026, bordures festives et formats d'engagement.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
