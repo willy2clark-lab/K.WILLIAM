@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Download, SplitSquareVertical, LayoutGrid, RotateCcw } from 'lucide-react';
+import { Sparkles, Download, SplitSquareVertical, LayoutGrid, RotateCcw, Table, Check } from 'lucide-react';
 import { ViewMode } from '../types';
 
 interface Props {
@@ -8,6 +8,8 @@ interface Props {
   onOpenExport: () => void;
   onReset: () => void;
   onExportDiptych: () => void;
+  onCopySpreadsheet: () => void;
+  isCopiedSpreadsheet: boolean;
 }
 
 export const Header: React.FC<Props> = ({
@@ -16,6 +18,8 @@ export const Header: React.FC<Props> = ({
   onOpenExport,
   onReset,
   onExportDiptych,
+  onCopySpreadsheet,
+  isCopiedSpreadsheet,
 }) => {
   return (
     <header className="bg-slate-900 text-slate-100 border-b border-slate-800 sticky top-0 z-40 px-4 lg:px-8 py-3.5 shadow-md">
@@ -80,7 +84,32 @@ export const Header: React.FC<Props> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center flex-wrap gap-2">
+          {/* Demande Utilisateur : Bouton Rouge pour copier tout le contenu au format tableur */}
+          <button
+            type="button"
+            id="btn-copy-spreadsheet-red"
+            onClick={onCopySpreadsheet}
+            title="Copier tout le contenu (produits, réglages, légendes, hashtags) pour le coller directement dans Excel ou Google Sheets"
+            className={`inline-flex items-center gap-2 text-xs font-bold px-3.5 py-2 rounded-lg transition-all cursor-pointer shadow-md ${
+              isCopiedSpreadsheet
+                ? 'bg-red-700 text-white ring-2 ring-white/60 scale-105'
+                : 'bg-red-600 hover:bg-red-500 active:bg-red-700 text-white border border-red-400/60 shadow-red-950/40 hover:scale-[1.02]'
+            }`}
+          >
+            {isCopiedSpreadsheet ? (
+              <>
+                <Check className="w-4 h-4 text-white animate-bounce" />
+                <span>✓ Copié pour Tableur !</span>
+              </>
+            ) : (
+              <>
+                <Table className="w-4 h-4 text-white" />
+                <span>Copier pour Tableur</span>
+              </>
+            )}
+          </button>
+
           <button
             type="button"
             onClick={onReset}

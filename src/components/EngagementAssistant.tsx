@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share2, Bookmark, MessageSquare, Copy, Check, Wand2, HelpCircle } from 'lucide-react';
+import { Share2, Bookmark, MessageSquare, Copy, Check, Wand2, HelpCircle, Table } from 'lucide-react';
 import { RawProduct, FilterSettings, BorderSettings, StickerBadge, FestiveCopy } from '../types';
 
 interface Props {
@@ -9,6 +9,10 @@ interface Props {
   badges: StickerBadge[];
   onToggleBadge: (badgeId: string) => void;
   onSetBadges: (badges: StickerBadge[]) => void;
+  captions: FestiveCopy[];
+  setCaptions: React.Dispatch<React.SetStateAction<FestiveCopy[]>>;
+  onCopySpreadsheet?: () => void;
+  isCopiedSpreadsheet?: boolean;
 }
 
 export const EngagementAssistant: React.FC<Props> = ({
@@ -17,16 +21,12 @@ export const EngagementAssistant: React.FC<Props> = ({
   border,
   badges,
   onToggleBadge,
+  captions,
+  setCaptions,
+  onCopySpreadsheet,
+  isCopiedSpreadsheet,
 }) => {
   const [loadingCopy, setLoadingCopy] = useState(false);
-  const [captions, setCaptions] = useState<FestiveCopy[]>([
-    {
-      hook: `✨ Du brut de l'atelier au visuel de fête : zoom sur ${product.name}.`,
-      body: `Pour ces fêtes 2026, nous avons choisi de préserver chaque nuance et texture de notre création brute, sublimée par un étalonnage studio feutré et notre bordure artisanale. Une pièce pensée pour durer et émouvoir sous le sapin.`,
-      question: `🎄 Dites-nous : vous êtes plutôt préparation des cadeaux dès novembre ou team dernière minute ?`,
-      hashtags: `#${product.name.replace(/\s+/g, '')} #ArtisanatFestif #CadeauDeNoel #Tendances2026 #StudioFestif #FaitMain`,
-    },
-  ]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const handleGenerateCopy = async () => {
@@ -221,6 +221,46 @@ export const EngagementAssistant: React.FC<Props> = ({
           })}
         </div>
       </div>
+
+      {/* Export Tableur Exclusif (Bouton Rouge) */}
+      {onCopySpreadsheet && (
+        <div className="bg-gradient-to-r from-red-950/40 via-slate-900 to-red-950/30 border border-red-800/50 rounded-xl p-4 space-y-2.5 shadow-md">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-red-200 flex items-center gap-2">
+              <Table className="w-4 h-4 text-red-400" />
+              Export Tableur Global (Excel / Sheets / Calc)
+            </span>
+            <span className="text-[10px] font-mono bg-red-950 text-red-300 border border-red-800/60 px-2 py-0.5 rounded">
+              Format TSV / HTML
+            </span>
+          </div>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            Copiez instantanément toutes les données du studio (produits, étalonnage, bordures, badges et textes complets) avec un formatage prêt à coller dans des colonnes distinctes.
+          </p>
+          <button
+            type="button"
+            id="btn-copy-spreadsheet-red-panel"
+            onClick={onCopySpreadsheet}
+            className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md ${
+              isCopiedSpreadsheet
+                ? 'bg-red-700 text-white ring-2 ring-white/50 scale-[1.01]'
+                : 'bg-red-600 hover:bg-red-500 active:bg-red-700 text-white border border-red-400/60 hover:shadow-red-600/30'
+            }`}
+          >
+            {isCopiedSpreadsheet ? (
+              <>
+                <Check className="w-4 h-4 text-white animate-bounce" />
+                <span>✓ Tout le contenu est copié pour votre Tableur !</span>
+              </>
+            ) : (
+              <>
+                <Table className="w-4 h-4 text-white" />
+                <span>Copier tout le contenu pour Tableur</span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

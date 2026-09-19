@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Download, Check, SplitSquareVertical, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { X, Download, Check, SplitSquareVertical, Image as ImageIcon, Sparkles, Table } from 'lucide-react';
 import { RawProduct, FilterSettings, BorderSettings, StickerBadge, AspectRatio } from '../types';
 import { renderPostToCanvas, downloadCanvas } from '../utils/canvasRenderer';
 
@@ -12,6 +12,8 @@ interface Props {
   badges: StickerBadge[];
   aspectRatio: AspectRatio;
   diptychOnly?: boolean;
+  onCopySpreadsheet?: () => void;
+  isCopiedSpreadsheet?: boolean;
 }
 
 export const ExportModal: React.FC<Props> = ({
@@ -23,6 +25,8 @@ export const ExportModal: React.FC<Props> = ({
   badges,
   aspectRatio,
   diptychOnly = false,
+  onCopySpreadsheet,
+  isCopiedSpreadsheet,
 }) => {
   const [format, setFormat] = useState<'png' | 'jpeg'>('png');
   const [isDiptych, setIsDiptych] = useState<boolean>(diptychOnly);
@@ -211,7 +215,7 @@ export const ExportModal: React.FC<Props> = ({
         </div>
 
         {/* Action Button */}
-        <div className="pt-2">
+        <div className="pt-2 space-y-2">
           <button
             type="button"
             onClick={handleDownload}
@@ -235,6 +239,31 @@ export const ExportModal: React.FC<Props> = ({
               </>
             )}
           </button>
+
+          {onCopySpreadsheet && (
+            <button
+              type="button"
+              id="btn-copy-spreadsheet-red-modal"
+              onClick={onCopySpreadsheet}
+              className={`w-full py-2.5 rounded-xl font-bold text-xs shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                isCopiedSpreadsheet
+                  ? 'bg-red-700 text-white ring-2 ring-white/60'
+                  : 'bg-red-600 hover:bg-red-500 active:bg-red-700 text-white border border-red-400/50 hover:shadow-red-600/30'
+              }`}
+            >
+              {isCopiedSpreadsheet ? (
+                <>
+                  <Check className="w-4 h-4 text-white animate-bounce" />
+                  <span>✓ Tout le contenu est copié pour votre Tableur !</span>
+                </>
+              ) : (
+                <>
+                  <Table className="w-4 h-4 text-white" />
+                  <span>Copier tout le contenu pour Tableur (Excel / Sheets)</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </div>

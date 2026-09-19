@@ -4,8 +4,8 @@
  */
 
 import { useState } from 'react';
-import { Camera, Sliders, Frame, Sparkles, Wand2, ShieldCheck, HeartHandshake } from 'lucide-react';
-import { RawProduct, FilterSettings, BorderSettings, StickerBadge, ViewMode, AspectRatio, FilterPreset } from './types';
+import { Camera, Sliders, Frame, Sparkles, Wand2, ShieldCheck, HeartHandshake, Table, Check } from 'lucide-react';
+import { RawProduct, FilterSettings, BorderSettings, StickerBadge, ViewMode, AspectRatio, FilterPreset, FestiveCopy } from './types';
 import { SAMPLE_PRODUCTS } from './data/sampleProducts';
 import { FILTER_PRESETS, DEFAULT_FILTER_SETTINGS } from './data/filterPresets';
 import { BORDER_OPTIONS, DEFAULT_BORDER_SETTINGS } from './data/borderStyles';
@@ -16,6 +16,7 @@ import { BorderControls } from './components/BorderControls';
 import { EngagementAssistant } from './components/EngagementAssistant';
 import { PreviewStage } from './components/PreviewStage';
 import { ExportModal } from './components/ExportModal';
+import { copySpreadsheetDataToClipboard } from './utils/spreadsheetExport';
 
 const INITIAL_BADGES: StickerBadge[] = [
   {
@@ -86,6 +87,41 @@ export default function App() {
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [exportDiptychOnly, setExportDiptychOnly] = useState(false);
 
+  // Captions State (shared between Engagement tab and Spreadsheet export)
+  const [captions, setCaptions] = useState<FestiveCopy[]>([
+    {
+      hook: `✨ Du brut de l'atelier au visuel de fête : zoom sur ${selectedProduct.name}.`,
+      body: `Pour ces fêtes 2026, nous avons choisi de préserver chaque nuance et texture de notre création brute, sublimée par un étalonnage studio feutré et notre bordure artisanale. Une pièce pensée pour durer et émouvoir sous le sapin.`,
+      question: `🎄 Dites-nous : vous êtes plutôt préparation des cadeaux dès novembre ou team dernière minute ?`,
+      hashtags: `#${selectedProduct.name.replace(/\s+/g, '')} #ArtisanatFestif #CadeauDeNoel #Tendances2026 #StudioFestif #FaitMain`,
+    },
+  ]);
+
+  // Spreadsheet Copy State
+  const [isCopiedSpreadsheet, setIsCopiedSpreadsheet] = useState(false);
+  const [showSpreadsheetToast, setShowSpreadsheetToast] = useState(false);
+
+  // Function to copy all studio content formatted for spreadsheets
+  const handleCopySpreadsheet = async () => {
+    const success = await copySpreadsheetDataToClipboard({
+      product: selectedProduct,
+      filter,
+      border,
+      badges,
+      captions,
+      allProducts: products,
+      aspectRatio,
+      viewMode,
+    });
+
+    if (success) {
+      setIsCopiedSpreadsheet(true);
+      setShowSpreadsheetToast(true);
+      setTimeout(() => setIsCopiedSpreadsheet(false), 3500);
+      setTimeout(() => setShowSpreadsheetToast(false), 4500);
+    }
+  };
+
   // Preset Selection
   const handleSelectPreset = (preset: FilterPreset) => {
     setFilter((prev) => ({
@@ -135,6 +171,8 @@ export default function App() {
         onOpenExport={handleOpenStandardExport}
         onReset={handleReset}
         onExportDiptych={handleOpenDiptychExport}
+        onCopySpreadsheet={handleCopySpreadsheet}
+        isCopiedSpreadsheet={isCopiedSpreadsheet}
       />
 
       {/* Main Studio Workspace */}
@@ -232,6 +270,10 @@ export default function App() {
                 badges={badges}
                 onToggleBadge={handleToggleBadge}
                 onSetBadges={setBadges}
+                captions={captions}
+                setCaptions={setCaptions}
+                onCopySpreadsheet={handleCopySpreadsheet}
+                isCopiedSpreadsheet={isCopiedSpreadsheet}
               />
             )}
           </div>
@@ -289,7 +331,36 @@ export default function App() {
         badges={badges}
         aspectRatio={aspectRatio}
         diptychOnly={exportDiptychOnly}
+        onCopySpreadsheet={handleCopySpreadsheet}
+        isCopiedSpreadsheet={isCopiedSpreadsheet}
       />
+
+      {/* Floating Spreadsheet Copy Confirmation Toast */}
+      {showSpreadsheetToast && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-5 right-5 z-50 max-w-md bg-red-600 text-white border-2 border-white/20 p-4 rounded-2xl shadow-2xl shadow-red-950/60 flex items-start gap-3.5 transition-all transform animate-bounce"
+        >
+          <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center shrink-0 mt-0.5">
+            <Check className="w-5 h-5 text-white stroke-[3]" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-sm tracking-wide">Copié au format tableur !</h4>
+              <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-black/20 text-red-100">
+                TSV / Excel
+              </span>
+            </div>
+            <p className="text-xs text-red-100 mt-1 leading-snug">
+              Toutes les données (produit, textures, étalonnage, bordures, badges et légendes) sont dans votre presse-papier.
+            </p>
+            <p className="text-[11px] font-semibold text-white mt-1.5 bg-red-700/60 px-2 py-1 rounded-md">
+              💡 Ouvrez <strong>Google Sheets</strong> ou <strong>Excel</strong> et faites <strong>Ctrl+V</strong> (ou Cmd+V) : les colonnes et cellules se remplissent automatiquement !
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
